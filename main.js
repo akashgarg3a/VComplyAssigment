@@ -3,6 +3,7 @@ const app = express();
 const port = 8000;
 const userRouter = require('./router/userRouter');
 const workFlowRouter = require('./router/workFlowRouter');
+const db = require('./config/connection');
 // 127.0.0.1:8000
 //  node server
 const http = require('http').createServer(app);
