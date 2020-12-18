@@ -1,12 +1,30 @@
 let workflow = require('../models/workFlow')
 let userController = require('./userController');
+const notification = require("./models/notifications");
 
-function addLevel(req, res){
+async function addLevel(req, res){
     try{
         levelObj = req.body;
         
-        let preLevel = workflow.find().sort({level:-1}).limit(1);
-        
+        let preLevel = await workflow.find().sort({level:-1}).limit(1);
+        if(!preLevel) {
+            // setting notification
+            notification.create({
+            last_action:"just started",
+            level:"1",
+            levelType:levelObj.approval,
+            WorkflowState:"active",
+            Priority:0
+            }, (err, res) =>{
+                if(err)
+                    console.log(err);
+                else
+                    console.log(res);
+            }
+            
+            )
+            preLevel = 0;
+        }
         console.log(id);
         for(let x = 0; x < levelObj.users.length; x++) {
             let id = userController.getUserId(levelObj.users[x]);

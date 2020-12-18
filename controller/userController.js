@@ -2,8 +2,8 @@ let user = require('../models/user');
 let notification = require("../models/notifications");
 let workflow = require("../models/workFlow");
 
-async function sendResponse(req, res) {
-    let result = await notification.findOne({}, function(err,res) {
+function sendResponse(req, res) {
+    let result = notification.findOne({}, function(err,res) {
         if(err) 
             return err;
         else
@@ -12,7 +12,7 @@ async function sendResponse(req, res) {
     let {userName, response} = req.body;
     let status = result.status;
     if(status == 'active') {
-        let users = await workflow.find({level: result.level, Priority: result.Priority, status: "pending"}, function(err, res) {
+        let users = workflow.find({level: result.level, Priority: result.Priority, status: "pending"}, function(err, res) {
             if(err) 
                 return err;
             else
@@ -27,7 +27,7 @@ async function sendResponse(req, res) {
         }
         if(valid) {
             if(response == "Reject") {
-                await notification.updateOne({},{status: "terminated", last_action: userName}, function(err, res) {
+                notification.updateOne({},{status: "terminated", last_action: userName}, function(err, res) {
                     if(err)
                         console.log(err);
                     else
@@ -39,12 +39,12 @@ async function sendResponse(req, res) {
                 })
             } else if(response == "Approve") {
                 if(result.levelType == 'any_one' || users.length == 1) {
-                    let newLevelUsers =await workflow.find({level: result.level + 1},function(err, res) {
+                    let newLevelUsers =workflow.find({level: result.level + 1},function(err, res) {
                         if(err) return(err);
                         else return res;
                     })
                     if(newLevelUsers.length == 0) {
-                        await notification.updateOne({},{levelStatus: "Executed", last_action: userName}, function(err, res) {
+                        notification.updateOne({},{levelStatus: "Executed", last_action: userName}, function(err, res) {
                             if(err)
                                 console.log(err);
                             else
@@ -55,7 +55,7 @@ async function sendResponse(req, res) {
                             message: "workflow Exceuted"
                         })
                     } else {
-                        await notification.updateOne({},{Priority: 0, level: result.level + 1, last_action: userName, levelType: newLevelUsers[0].Approval}, function(err, res) {
+                        notification.updateOne({},{Priority: 0, level: result.level + 1, last_action: userName, levelType: newLevelUsers[0].Approval}, function(err, res) {
                             if(err)
                                 console.log(err);
                             else
@@ -68,7 +68,7 @@ async function sendResponse(req, res) {
                     }
                 } else {
                     if(result.levelType == 'sequential)') {
-                        await notification.updateOne({},{Priority: parseInt(Priority) + 1, last_action: userName}, function(err, res) {
+                        notification.updateOne({},{Priority: parseInt(Priority) + 1, last_action: userName}, function(err, res) {
                             if(err)
                                 console.log(err);
                             else
@@ -79,7 +79,7 @@ async function sendResponse(req, res) {
                             message: "workflow Active"
                         })
                     }else {
-                        await notification.updateOne({},{last_action: userName}, function(err, res) {
+                        notification.updateOne({},{last_action: userName}, function(err, res) {
                             if(err)
                                 console.log(err);
                             else
@@ -93,12 +93,12 @@ async function sendResponse(req, res) {
                 }
             } else {
                 if(users.length == 1) {
-                    let newLevelUsers =await workflow.find({level: result.level + 1},function(err, res) {
+                    let newLevelUsers = workflow.find({level: result.level + 1},function(err, res) {
                         if(err) return(err);
                         else return res;
                     })
                     if(newLevelUsers.length == 0) {
-                        await notification.updateOne({},{levelStatus: "Executed", last_action: userName}, function(err, res) {
+                        notification.updateOne({},{levelStatus: "Executed", last_action: userName}, function(err, res) {
                             if(err)
                                 console.log(err);
                             else
@@ -109,7 +109,7 @@ async function sendResponse(req, res) {
                             message: "workflow Exceuted"
                         })
                     } else {
-                        await notification.updateOne({},{Priority: 0, level: result.level + 1, last_action: userName, levelType: newLevelUsers[0].Approval}, function(err, res) {
+                        notification.updateOne({},{Priority: 0, level: result.level + 1, last_action: userName, levelType: newLevelUsers[0].Approval}, function(err, res) {
                             if(err)
                                 console.log(err);
                             else
@@ -122,7 +122,7 @@ async function sendResponse(req, res) {
                     }
                 } else {
                     if(result.levelType == 'sequential)') {
-                        await notification.updateOne({},{Priority: parseInt(Priority) + 1, last_action: userName}, function(err, res) {
+                        notification.updateOne({},{Priority: parseInt(Priority) + 1, last_action: userName}, function(err, res) {
                             if(err)
                                 console.log(err);
                             else
@@ -133,7 +133,7 @@ async function sendResponse(req, res) {
                             message: "workflow Active"
                         })
                     }else {
-                        await notification.updateOne({},{last_action: userName}, function(err, res) {
+                        notification.updateOne({},{last_action: userName}, function(err, res) {
                             if(err)
                                 console.log(err);
                             else
@@ -160,8 +160,8 @@ async function sendResponse(req, res) {
     }
 }
 
-async function getUserId(user_id) {
-    return await user.findOne({name: user_id}, function(err, res) {
+function getUserId(user_id) {
+    return user.findOne({name: user_id}, function(err, res) {
         if(err) {
             return err;
         } else
